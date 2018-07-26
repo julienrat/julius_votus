@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+
+<meta charset="UTF-8">
+<head>
+	<title>Votes à la jules césar !</title>
+	<script src="charts/Chart.bundle.js"></script>
+	<script src="charts/utils.js"></script>
+</head>
+
+<body>
+	<div id="canvas-holder" style="width:70%">
+		<canvas id="chart-area"></canvas>
+	</div>
+	<form action="erase.php" target="hidden-form">
+        <input type="submit" value="Effacer">
+	</form>
+	<h2><div id="TXT"></div></h2>
+	<h2><div id="OUI"></div></h2>
+	<IFRAME style="display:none" name="hidden-form"></IFRAME>  
+		<script>
+		var randomScalingFactor = function() {
+			return Math.round(Math.random() * 100);
+		};
+		var yes=0;
+		var no=0;
+		var update=0;
+		var total=0;
+
+	  var num_yes=function(){
+		var xmlhttp = new XMLHttpRequest();
+		var yesaille=0;
+		var noaille=0;
+		
+		xmlhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				var myArr = JSON.parse(this.responseText);
+				console.log(myArr);
+				
+				for (var i=0;i<myArr.length;i++){
+				yesaille=yesaille + parseInt(myArr[i].value);
+				}
+			
+				 noaille=myArr.length-yesaille;
+				store_values(yesaille,noaille);
+				//document.getElementById("demo").innerHTML = yes;
+			}
+			//yes=yesaille;
+			//no=noaille;
+		};
+		xmlhttp.open("GET", "data.json", true);
+		xmlhttp.send();
+		//console.log(no);
+			return [yesaille,noaille];
+		
+		}
+		function store_values(a,b){			
+			yes = b;
+			no = a;	
+			total = yes + no;
+			
+			
+		
+			config.data.datasets[0].data[0]=no;
+			config.data.datasets[0].data[1]=yes;
+			
+			window.myPie.update();	
+			
+			
+		}
+		
+
+		var config = {
+			type: 'pie',
+			data: {
+				datasets: [{
+					data: [
+						no,
+						yes,
+					],
+					backgroundColor: [
+						window.chartColors.red,
+						window.chartColors.blue,
+					],
+					label: 'Dataset 1'
+				}],
+				labels: [
+					'NON',
+					'OUI',
+					
+				]
+			},
+			options: {
+				responsive: true
+			}
+		};
+
+		window.onload = function() {
+			var results = num_yes();		
+			var ctx = document.getElementById('chart-area').getContext('2d');
+			window.myPie = new Chart(ctx, config);		
+			window.myPie.update();
+		};
+
+	
+ window.setInterval("refreshDiv()", 1000);  
+        function refreshDiv()
+		{
+			num_yes();
+			document.querySelector("#TXT").innerHTML = "NB de votants : "+total;
+			document.querySelector("#OUI").innerHTML = yes+" OUI / "+no+" NON";
+			
+			window.myPie.update();
+		}
+		
+		
+		
+	</script>
+	
+</body>
+
+</html>
+

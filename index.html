@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>Télécommande</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+   
+</head>
+<body>
+	<input type="button" id="toggle" value="desactiver la mise en veille" />
+
+
+ <script  type="text/javascript" src="fingerprint.js"></script>
+<script src="NoSleep.js"></script>
+<script type="text/javascript">
+
+	var fingerprint = new Fingerprint({screen_resolution: true}).get();
+	 var noSleep = new NoSleep();
+	var chgt=0;
+	var lastchgt=1;
+		//document.querySelector("#number").innerHTML = "Number : "+ fingerprint;
+    if (window.DeviceOrientationEvent) {
+        console.log("DeviceOrientation is supported");
+
+        window.addEventListener('deviceorientation', function (eventData) {
+            var LR = eventData.gamma;
+            var FB = eventData.beta;
+            var DIR = eventData.alpha;
+          
+            deviceOrientationHandler(LR, FB, DIR);
+            
+        }, false);
+    } else {
+        alert("Device orientation not supported on your device or browser.  Sorry.");
+    }
+
+    function deviceOrientationHandler(LR, FB, DIR) {
+		
+		
+	
+		if (FB < 0){
+				document.body.style.backgroundColor = "red";
+				//document.querySelector("#TXT").innerHTML = "NON ";
+				//navigator.vibrate(200);
+				chgt=1;
+				
+			}else{
+				document.body.style.backgroundColor = "green";
+			//	document.querySelector("#TXT").innerHTML = "OUI ";
+			//	navigator.vibrate(0);
+			    chgt=0;
+			}
+			if(lastchgt!=chgt){
+	
+			var response=	httpGet('http://moumoute.biz/vote/iot.php?nom='+fingerprint+'&txt='+chgt);
+
+	
+			//	window.navigator.vibrate(200);
+				//document.querySelector("#val").innerHTML = response;
+			
+		    }
+		    lastchgt=chgt;
+	
+    }
+    	  
+      function httpGet(theUrl)
+		{
+			var xmlHttp = new XMLHttpRequest();
+			xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+			xmlHttp.send( null );
+			return xmlHttp.responseText;
+		}
+ var wakeLockEnabled = false;
+      var toggleEl = document.querySelector("#toggle");
+      toggleEl.addEventListener('click', function() {
+        if (!wakeLockEnabled) {
+          noSleep.enable(); // keep the screen on!
+          wakeLockEnabled = true;
+          toggleEl.value = "activer la mise en veille";
+          document.body.style.backgroundColor = "green";
+        } else {
+          noSleep.disable(); // let the screen turn off.
+          wakeLockEnabled = false;
+          toggleEl.value = "desactiver la mise en veille";
+          document.body.style.backgroundColor = "";
+        }
+      }, false);
+</script>
+ 
+ 
+</body>
+</html>

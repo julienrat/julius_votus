@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Resultat de OUi</h2>
+
+<p id="demo"></p>
+
+<script>
+
+var xmlhttp = new XMLHttpRequest();
+xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var myArr = JSON.parse(this.responseText);
+        console.log(myArr);
+        var yes=0;
+        for (var i=0;i<myArr.length;i++){
+		    yes=yes+ parseInt(myArr[i].value);
+		}
+        document.getElementById("demo").innerHTML = yes;
+    }
+};
+xmlhttp.open("GET", "data.json", true);
+xmlhttp.send();
+
+</script>
+
+<p>Take a look at <a href="data.json" target="_blank">json_demo_array.txt</a></p>
+
+</body>
+</html>
